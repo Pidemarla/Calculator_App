@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculator</title>
+    <style>
+        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f4; }
+        #calculator { background: #fff; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); }
+        button { margin: 5px; padding: 20px; font-size: 20px; }
+        #result { margin-bottom: 10px; font-size: 24px; }
+    </style>
+</head>
+<body>
+    <div id="calculator">
+        <div id="result">0</div>
+        <div>
+            <button onclick="appendToExpression('1')">1</button>
+            <button onclick="appendToExpression('2')">2</button>
+            <button onclick="appendToExpression('3')">3</button>
+            <button onclick="appendToExpression('+')">+</button>
+        </div>
+        <div>
+            <button onclick="appendToExpression('4')">4</button>
+            <button onclick="appendToExpression('5')">5</button>
+            <button onclick="appendToExpression('6')">6</button>
+            <button onclick="appendToExpression('-')">-</button>
+        </div>
+        <div>
+            <button onclick="appendToExpression('7')">7</button>
+            <button onclick="appendToExpression('8')">8</button>
+            <button onclick="appendToExpression('9')">9</button>
+            <button onclick="appendToExpression('*')">*</button>
+        </div>
+        <div>
+            <button onclick="appendToExpression('0')">0</button>
+            <button onclick="calculateResult()">=</button>
+            <button onclick="clearExpression()">C</button>
+            <button onclick="appendToExpression('/')">/</button>
+        </div>
+    </div>
+
+    <script>
+        let expression = '';
+
+        function appendToExpression(value) {
+            expression += value;
+            document.getElementById('result').innerText = expression;
+        }
+
+        function clearExpression() {
+            expression = '';
+            document.getElementById('result').innerText = '0';
+        }
+
+        function calculateResult() {
+            fetch('/calculate', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ expression }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.result !== undefined) {
+                    document.getElementById('result').innerText = data.result;
+                    expression = data.result.toString(); // Update expression to show result
+                } else {
+                    document.getElementById('result').innerText = 'Error';
+                }
+            })
+            .catch(error => {
+                console.error('There was a problem with the fetch operation:', error);
+                document.getElementById('result').innerText = 'Error';
+            });
+        }
+    </script>
+</body>
+</html>
